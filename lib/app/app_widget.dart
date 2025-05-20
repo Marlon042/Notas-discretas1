@@ -4,6 +4,7 @@ import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/auth/repositories/auth_repository.dart';
 import 'package:prueba/features/auth/screens/auth_screen.dart';
 import 'package:prueba/features/auth/screens/home_screen.dart';
+import 'package:prueba/features/auth/screens/register_screen.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -24,6 +25,8 @@ class AppWidget extends StatelessWidget {
           routes: {
             '/': (context) => const AuthScreen(),
             '/home': (context) => const HomeScreen(),
+            '/login': (context) => const AuthScreen(),
+            '/register': (context) => const RegisterScreen(),
           },
         ),
       ),

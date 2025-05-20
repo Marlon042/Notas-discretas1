@@ -13,14 +13,31 @@ class AuthRepository {
         password: password,
       );
       return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.code);
     } catch (e) {
-      throw Exception('Error al iniciar sesión: $e');
+      throw Exception('Error desconocido al iniciar sesión');
+    }
+  }
+
+  Future<User?> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.code);
+    } catch (e) {
+      throw Exception('Error desconocido al registrarse');
     }
   }
 
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
-
-  Stream<User?> get user => _firebaseAuth.authStateChanges();
 }
