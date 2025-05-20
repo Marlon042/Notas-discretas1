@@ -11,7 +11,10 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthSuccess extends AuthState {}
+class AuthSuccess extends AuthState {} // Para login exitoso
+
+class RegistrationSuccess
+    extends AuthState {} // Nuevo estado para registro exitoso
 
 class AuthFailure extends AuthState {
   final String error;

@@ -30,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  // Cambiar el método _onSignUpRequested:
   void _onSignUpRequested(
     SignUpRequested event,
     Emitter<AuthState> emit,
@@ -40,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-      emit(AuthSuccess());
+      emit(RegistrationSuccess()); // Nuevo estado para registro exitoso
     } catch (e) {
       emit(AuthFailure(error: _mapAuthError(e.toString())));
     }

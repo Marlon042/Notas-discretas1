@@ -170,17 +170,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
 
                 // Botón de registro
+                // Modificar el BlocConsumer en el build():
                 BlocConsumer<AuthBloc, AuthState>(
                   listener: (context, state) {
-                    if (state is AuthSuccess) {
-                      Navigator.pushReplacementNamed(context, '/home');
+                    if (state is RegistrationSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            '¡Registro exitoso! Por favor inicia sesión',
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      Navigator.pop(context); // Regresa al login
                     }
                     if (state is AuthFailure) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            state.error.replaceAll('Exception: ', ''),
-                          ),
+                          content: Text(state.error),
                           backgroundColor: Colors.redAccent,
                         ),
                       );
