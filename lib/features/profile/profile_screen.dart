@@ -2,16 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  // Listas de avatares (asegúrate de tener estas imágenes en assets/images/)
+  final List<String> maleAvatars = [
+    'assets/images/male_avatar1.png',
+    'assets/images/male_avatar2.png',
+    'assets/images/male_avatar3.png',
+    'assets/images/male_avatar4.png',
+    'assets/images/male_avatar5.png',
+  ];
+  final List<String> femaleAvatars = [
+    'assets/images/female_avatar1.png',
+    'assets/images/female_avatar2.png',
+    'assets/images/female_avatar3.png',
+    'assets/images/female_avatar4.png',
+    'assets/images/female_avatar5.png',
+  ];
+
+  String? _selectedAvatar;
+
+  @override
   Widget build(BuildContext context) {
-    final user =
-        context
-            .read<AuthBloc>()
-            .state
-            .user; // Asume que guardas el User en el estado
+    final user = context.read<AuthBloc>().state.user;
+
+    // Si el usuario ya tiene un avatar, úsalo; si no, usa el seleccionado localmente o el default
+    ImageProvider avatarImage;
+    if (user?.photoURL != null) {
+      avatarImage = NetworkImage(user!.photoURL!);
+    } else if (_selectedAvatar != null) {
+      avatarImage = AssetImage(_selectedAvatar!);
+    } else {
+      avatarImage = const AssetImage('assets/images/default_avatar.jpeg');
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -28,29 +57,41 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // Avatar
-            CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  user?.photoURL != null
-                      ? NetworkImage(user!.photoURL!)
-                      : const AssetImage('assets/images/default_avatar.jpeg')
-                          as ImageProvider,
-              child:
-                  user?.photoURL == null
-                      ? const Icon(Icons.person, size: 0)
-                      : null,
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: avatarImage,
+                  child:
+                      user?.photoURL == null && _selectedAvatar == null
+                          ? const Icon(Icons.person, size: 0)
+                          : null,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 4,
+                  child: InkWell(
+                    onTap: () => _showAvatarPicker(context),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.white,
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 20,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-
-            // Nombre
             Text(
               user?.displayName ?? 'Discrete User',
-
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
-
-            // Email
             Text(
               user?.email ?? 'No email',
               style: Theme.of(
@@ -58,11 +99,57 @@ class ProfileScreen extends StatelessWidget {
               ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),
-
-            // Sección de ajustes
             _buildSettingsCard(context),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAvatarPicker(BuildContext context) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) {
+        return SizedBox(
+          height: 320,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Escoge tu avatar',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 5,
+                  children: [
+                    ...maleAvatars.map((path) => _avatarOption(path)),
+                    ...femaleAvatars.map((path) => _avatarOption(path)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (selected != null) {
+      setState(() {
+        _selectedAvatar = selected;
+      });
+    }
+  }
+
+  Widget _avatarOption(String assetPath) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context, assetPath);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: CircleAvatar(backgroundImage: AssetImage(assetPath), radius: 30),
       ),
     );
   }
