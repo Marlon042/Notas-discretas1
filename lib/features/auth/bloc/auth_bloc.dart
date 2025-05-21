@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:prueba/features/auth/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
@@ -20,30 +21,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      await authRepository.signInWithEmailAndPassword(
+      final user = await authRepository.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      emit(AuthSuccess());
+      emit(AuthSuccess(user!));
     } catch (e) {
-      emit(AuthFailure(error: _mapAuthError(e.toString())));
+      emit(AuthFailure(_mapAuthError(e.toString())));
     }
   }
 
-  // Cambiar el método _onSignUpRequested:
   void _onSignUpRequested(
     SignUpRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
     try {
-      await authRepository.signUpWithEmailAndPassword(
+      final user = await authRepository.signUpWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      emit(RegistrationSuccess()); // Nuevo estado para registro exitoso
+      emit(RegistrationSuccess(user!));
     } catch (e) {
-      emit(AuthFailure(error: _mapAuthError(e.toString())));
+      emit(AuthFailure(_mapAuthError(e.toString())));
     }
   }
 

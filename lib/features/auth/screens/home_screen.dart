@@ -1,4 +1,3 @@
-// lib/features/notes/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
@@ -15,16 +14,37 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
+          // Botón de búsqueda
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => Navigator.pushNamed(context, '/search'),
+            tooltip: 'Buscar notas',
           ),
-          PopupMenuButton(
+
+          // Botón de perfil
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+            tooltip: 'Mi perfil',
+          ),
+
+          // Menú desplegable (con logout)
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
             itemBuilder:
                 (context) => [
                   const PopupMenuItem(
                     value: 'logout',
-                    child: Text('Cerrar sesión'),
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text(
+                          'Cerrar sesión',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
             onSelected: (value) {
@@ -36,11 +56,16 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+
+      // Botón flotante para crear notas
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF4A6FA5),
-        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () => Navigator.pushNamed(context, '/edit-note'),
+        tooltip: 'Crear nueva nota',
+        child: const Icon(Icons.add, color: Colors.white),
       ),
+
+      // Contenido principal
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -53,7 +78,10 @@ class HomeScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () => Navigator.pushNamed(context, '/edit-note'),
-              child: const Text('CREAR PRIMERA NOTA'),
+              child: const Text(
+                'CREAR PRIMERA NOTA',
+                style: TextStyle(color: Color(0xFF4A6FA5)),
+              ),
             ),
           ],
         ),
