@@ -43,6 +43,7 @@ dependencies:
   google_sign_in: ^6.1.5
   equatable: ^2.0.5
   bloc: ^9.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

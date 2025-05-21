@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,6 +28,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ];
 
   String? _selectedAvatar;
+  bool _loadingAvatar = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvatarFromFirestore();
+  }
+
+  Future<void> _loadAvatarFromFirestore() async {
+    final user = context.read<AuthBloc>().state.user;
+    if (user == null) {
+      setState(() {
+        _selectedAvatar = null;
+        _loadingAvatar = false;
+      });
+      return;
+    }
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+    setState(() {
+      _selectedAvatar = doc.data()?['avatar'] as String?;
+      _loadingAvatar = false;
+    });
+  }
+
+  Future<void> _saveAvatarToFirestore(String avatarPath) async {
+    final user = context.read<AuthBloc>().state.user;
+    if (user == null) return;
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      'avatar': avatarPath,
+    }, SetOptions(merge: true));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,54 +90,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Avatar
-            Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: avatarImage,
-                  child:
-                      user?.photoURL == null && _selectedAvatar == null
-                          ? const Icon(Icons.person, size: 0)
-                          : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 4,
-                  child: InkWell(
-                    onTap: () => _showAvatarPicker(context),
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white,
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 20,
-                        color: Colors.black54,
-                      ),
+        child:
+            _loadingAvatar
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                  children: [
+                    // Avatar
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: avatarImage,
+                          child:
+                              user?.photoURL == null && _selectedAvatar == null
+                                  ? const Icon(Icons.person, size: 0)
+                                  : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 4,
+                          child: InkWell(
+                            onTap: () => _showAvatarPicker(context),
+                            child: CircleAvatar(
+                              radius: 18,
+                              backgroundColor: Colors.white,
+                              child: const Icon(
+                                Icons.camera_alt,
+                                size: 20,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    Text(
+                      user?.displayName ?? 'Discrete User',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      user?.email ?? 'No email',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSettingsCard(context),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              user?.displayName ?? 'Discrete User',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user?.email ?? 'No email',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 32),
-            _buildSettingsCard(context),
-          ],
-        ),
       ),
     );
   }
@@ -139,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _selectedAvatar = selected;
       });
+      await _saveAvatarToFirestore(selected);
     }
   }
 
