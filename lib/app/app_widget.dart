@@ -5,6 +5,7 @@ import 'package:prueba/features/auth/repositories/auth_repository.dart';
 import 'package:prueba/features/auth/screens/auth_screen.dart';
 import 'package:prueba/features/auth/screens/home_screen.dart';
 import 'package:prueba/features/auth/screens/register_screen.dart';
+import 'package:prueba/features/notes/screens/note_editor_screen.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -27,6 +28,7 @@ class AppWidget extends StatelessWidget {
             '/home': (context) => const HomeScreen(),
             '/login': (context) => const AuthScreen(),
             '/register': (context) => const RegisterScreen(),
+            '/edit-note': (context) => const NoteEditorScreen(),
           },
         ),
       ),
