@@ -127,7 +127,6 @@ class HomeScreen extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          // TODO: Agrega aquí onTap para editar/ver la nota si lo deseas
                         ),
                       );
                     },
