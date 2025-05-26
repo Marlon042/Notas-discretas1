@@ -19,18 +19,83 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Notas Discretas'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthBloc>().add(SignOutRequested());
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.pushNamed(context, '/edit-note');
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF4A6FA5)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(
+                    radius: 32,
+                    backgroundImage: AssetImage(
+                      'assets/images/default_avatar.jpeg',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    user.email ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.note),
+              title: const Text('Notas'),
+              onTap: () {
+                Navigator.pop(context);
+                // Ya estás en HomeScreen, solo cierra el drawer
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Perfil'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Configuración'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/settings');
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Cerrar sesión',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                context.read<AuthBloc>().add(SignOutRequested());
+                await Future.delayed(const Duration(milliseconds: 200));
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:
