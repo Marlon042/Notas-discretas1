@@ -10,8 +10,6 @@ import 'package:prueba/features/profile/profile_screen.dart';
 import 'package:prueba/features/settings/settings_screen.dart';
 import 'package:prueba/features/notes/repositories/note_repository.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
-import 'package:prueba/features/notes/bloc/note_event.dart';
-import 'package:prueba/features/notes/bloc/note_state.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});

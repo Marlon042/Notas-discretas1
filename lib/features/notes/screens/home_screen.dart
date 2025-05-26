@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
 import 'package:prueba/features/notes/bloc/note_state.dart';
-import 'package:prueba/features/notes/models/note_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
