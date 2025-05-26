@@ -113,6 +113,7 @@ class HomeScreen extends StatelessWidget {
           }
           final notes = snapshot.data!.docs;
           return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: notes.length,
             itemBuilder: (context, index) {
               final note = notes[index];
@@ -136,17 +137,85 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.orange,
                 );
               }
-              return ListTile(
-                leading: leadingIcon,
-                title: Text(note['title'] ?? 'Sin título'),
-                subtitle: Text(
-                  'Creada: $dateStr\n${note['content'] ?? ''}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              return Card(
+                elevation: 3,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                onTap: () {
-                  // Aquí puedes navegar a la pantalla de edición si lo deseas
-                },
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  leading: leadingIcon ?? CircleAvatar(
+                    backgroundColor: Colors.blue[100],
+                    child: const Icon(Icons.note, color: Colors.blue),
+                  ),
+                  title: Text(
+                    note['title'] ?? 'Sin título',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4),
+                      Text(
+                        note['content'] ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(
+                            dateStr,
+                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: Text(note['title'] ?? 'Sin título'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  note['content'] ?? '',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      dateStr,
+                                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cerrar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
               );
             },
           );
