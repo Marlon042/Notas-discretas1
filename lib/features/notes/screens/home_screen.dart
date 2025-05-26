@@ -3,6 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
+import 'package:prueba/features/notes/bloc/note_bloc.dart';
+import 'package:prueba/features/notes/bloc/note_event.dart';
+import 'package:prueba/features/notes/bloc/note_state.dart';
+import 'package:prueba/features/notes/models/note_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,6 +17,9 @@ class HomeScreen extends StatelessWidget {
     if (user == null) {
       return const Center(child: Text('Usuario no autenticado'));
     }
+
+    // Dispara la carga de notas al construir la pantalla
+    context.read<NoteBloc>().add(LoadNotes(user.uid));
 
     return Scaffold(
       appBar: AppBar(
@@ -97,128 +104,151 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('notes')
-                .where('userId', isEqualTo: user.uid)
-                .orderBy('createdAt', descending: true)
-                .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: BlocBuilder<NoteBloc, NoteState>(
+        builder: (context, state) {
+          if (state is NoteLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No tienes notas aún.'));
-          }
-          final notes = snapshot.data!.docs;
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: notes.length,
-            itemBuilder: (context, index) {
-              final note = notes[index];
-              final createdAt = note['createdAt'];
-              String dateStr;
-              Widget? leadingIcon;
-              if (createdAt is Timestamp) {
-                final date = createdAt.toDate();
+          if (state is NoteLoaded) {
+            final notes = state.notes;
+            if (notes.isEmpty) {
+              return const Center(child: Text('No tienes notas aún.'));
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: notes.length,
+              itemBuilder: (context, index) {
+                final note = notes[index];
+                final date = note.createdAt;
                 final day = date.day.toString().padLeft(2, '0');
                 final month = date.month.toString().padLeft(2, '0');
                 final year = date.year;
                 final hour = date.hour.toString().padLeft(2, '0');
                 final minute = date.minute.toString().padLeft(2, '0');
-                dateStr = '$day/$month/$year $hour:$minute';
-                leadingIcon = null;
-              } else {
-                dateStr = 'Guardando...';
-                leadingIcon = const Icon(
-                  Icons.access_time,
-                  size: 18,
-                  color: Colors.orange,
-                );
-              }
-              return Card(
-                elevation: 3,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  leading: leadingIcon ?? CircleAvatar(
-                    backgroundColor: Colors.blue[100],
-                    child: const Icon(Icons.note, color: Colors.blue),
+                final dateStr = '$day/$month/$year $hour:$minute';
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  title: Text(
-                    note['title'] ?? 'Sin título',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text(
-                        note['content'] ?? '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 15),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue[100],
+                      child: const Icon(Icons.note, color: Colors.blue),
+                    ),
+                    title: Text(
+                      note.title.isNotEmpty ? note.title : 'Sin título',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          Text(
-                            dateStr,
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: Text(note['title'] ?? 'Sin título'),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  note['content'] ?? '',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      dateStr,
-                                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text(
+                          note.content,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: Colors.grey,
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cerrar'),
+                            const SizedBox(width: 4),
+                            Text(
+                              dateStr,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              );
-            },
-          );
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: Text(
+                              note.title.isNotEmpty ? note.title : 'Sin título',
+                            ),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    note.content,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.calendar_today,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        dateStr,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cerrar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context.read<NoteBloc>().add(
+                                    DeleteNote(note.id),
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          }
+          if (state is NoteError) {
+            return Center(child: Text(state.message));
+          }
+          return const SizedBox.shrink();
         },
       ),
     );

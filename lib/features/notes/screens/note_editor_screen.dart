@@ -2,6 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:prueba/features/notes/bloc/note_bloc.dart';
+import 'package:prueba/features/notes/bloc/note_event.dart';
+import 'package:prueba/features/notes/models/note_model.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   const NoteEditorScreen({super.key});
@@ -28,13 +32,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('Usuario no autenticado');
-      await FirebaseFirestore.instance.collection('notes').add({
-        'title': title,
-        'content': content,
-        'userId': user.uid,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final note = Note(
+        id: '', // Firestore asigna el id
+        title: title,
+        content: content,
+        createdAt: DateTime.now(),
+      );
+      context.read<NoteBloc>().add(AddNote(note, user.uid));
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(
