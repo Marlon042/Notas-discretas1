@@ -53,6 +53,7 @@ class HomeScreen extends StatelessWidget {
               final note = notes[index];
               final createdAt = note['createdAt'];
               String dateStr;
+              Widget? leadingIcon;
               if (createdAt is Timestamp) {
                 final date = createdAt.toDate();
                 final day = date.day.toString().padLeft(2, '0');
@@ -61,10 +62,17 @@ class HomeScreen extends StatelessWidget {
                 final hour = date.hour.toString().padLeft(2, '0');
                 final minute = date.minute.toString().padLeft(2, '0');
                 dateStr = '$day/$month/$year $hour:$minute';
+                leadingIcon = null;
               } else {
-                dateStr = 'Sin fecha';
+                dateStr = 'Guardando...';
+                leadingIcon = const Icon(
+                  Icons.access_time,
+                  size: 18,
+                  color: Colors.orange,
+                );
               }
               return ListTile(
+                leading: leadingIcon,
                 title: Text(note['title'] ?? 'Sin título'),
                 subtitle: Text(
                   'Creada: $dateStr\n${note['content'] ?? ''}',
