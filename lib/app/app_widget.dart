@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/auth/repositories/auth_repository.dart';
 import 'package:prueba/features/auth/screens/auth_screen.dart';
-import 'package:prueba/features/auth/screens/home_screen.dart';
 import 'package:prueba/features/auth/screens/register_screen.dart';
+import 'package:prueba/features/notes/screens/home_screen.dart';
 import 'package:prueba/features/notes/screens/note_editor_screen.dart';
 import 'package:prueba/features/profile/profile_screen.dart';
 
