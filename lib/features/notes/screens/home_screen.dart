@@ -72,180 +72,266 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
         ),
       ),
-      // <<<< CUSTOM WIDTH FOR DRAWER HERE!
-      drawer: SizedBox(
-        width: 260, // Cambia este valor para ajustar el ancho del Drawer
-        child: _CustomDrawer(user: user),
-      ),
+      drawer: SizedBox(width: 260, child: _CustomDrawer(user: user)),
       backgroundColor: const Color(0xFFF2F6FC),
       body: Padding(
         padding: const EdgeInsets.only(top: 90.0, left: 8, right: 8),
-        child: BlocBuilder<NoteBloc, NoteState>(
-          builder: (context, state) {
-            if (state is NoteLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is NoteLoaded) {
-              final notes = state.notes;
-              if (notes.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.note_add,
-                        size: 80,
-                        color: Colors.blueGrey[200],
-                      ),
-                      const SizedBox(height: 18),
-                      const Text(
-                        'No tienes notas aún.',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '¡Empieza creando tu primera nota!',
-                        style: TextStyle(color: Colors.blueGrey[400]),
-                      ),
-                    ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // BARRA DE BUSQUEDA
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Buscar notas...',
+                  prefixIcon: Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 0,
+                    horizontal: 16,
                   ),
-                );
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.only(bottom: 90, top: 10),
-                itemCount: notes.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 18),
-                itemBuilder: (context, index) {
-                  final note = notes[index];
-                  final date = note.createdAt;
-                  final dateStr =
-                      '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-
-                  return GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return _NoteDetailDialog(
-                            note: note,
-                            dateStr: dateStr,
-                          );
-                        },
-                      );
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(24),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                              child: Container(
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.82),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.blueGrey.withOpacity(0.12),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                // TODO: Implementar búsqueda si lo deseas
+              ),
+            ),
+            const SizedBox(height: 12),
+            // "CATEGORIAS"
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 6.0),
+              child: Text(
+                'Categorías',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // FILA DE ICONOS DE CATEGORIAS
+            SizedBox(
+              height: 72,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: const [
+                  _CategoryIcon(
+                    icon: Icons.person,
+                    label: "Personal",
+                    color: Colors.blue,
+                  ),
+                  _CategoryIcon(
+                    icon: Icons.work,
+                    label: "Trabajo",
+                    color: Colors.green,
+                  ),
+                  _CategoryIcon(
+                    icon: Icons.flight_takeoff,
+                    label: "Viajes",
+                    color: Colors.orange,
+                  ),
+                  _CategoryIcon(
+                    icon: Icons.health_and_safety,
+                    label: "Salud",
+                    color: Colors.red,
+                  ),
+                  _CategoryIcon(
+                    icon: Icons.add,
+                    label: "Agregar",
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // NOTAS (usa tu BlocBuilder aquí)
+            Expanded(
+              child: BlocBuilder<NoteBloc, NoteState>(
+                builder: (context, state) {
+                  if (state is NoteLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is NoteLoaded) {
+                    final notes = state.notes;
+                    if (notes.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.note_add,
+                              size: 80,
+                              color: Colors.blueGrey[200],
+                            ),
+                            const SizedBox(height: 18),
+                            const Text(
+                              'No tienes notas aún.',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                          Container(
-                            height: 120,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 14,
+                            const SizedBox(height: 10),
+                            Text(
+                              '¡Empieza creando tu primera nota!',
+                              style: TextStyle(color: Colors.blueGrey[400]),
                             ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 90, top: 10),
+                      itemCount: notes.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 18),
+                      itemBuilder: (context, index) {
+                        final note = notes[index];
+                        final date = note.createdAt;
+                        final dateStr =
+                            '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return _NoteDetailDialog(
+                                  note: note,
+                                  dateStr: dateStr,
+                                );
+                              },
+                            );
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            child: Stack(
                               children: [
-                                CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: Colors.blue[100],
-                                  child: Icon(
-                                    Icons.sticky_note_2,
-                                    color: Colors.blue[700],
-                                    size: 30,
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                      sigmaX: 8,
+                                      sigmaY: 8,
+                                    ),
+                                    child: Container(
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.82),
+                                        borderRadius: BorderRadius.circular(24),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.blueGrey.withOpacity(
+                                              0.12,
+                                            ),
+                                            blurRadius: 16,
+                                            offset: const Offset(0, 6),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(width: 18),
-                                Expanded(
-                                  child: Column(
+                                Container(
+                                  height: 120,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              note.title.isNotEmpty
-                                                  ? note.title
-                                                  : 'Sin título',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 19,
-                                                color: Colors.black87,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 7,
-                                              vertical: 1,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue[50],
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Row(
+                                      CircleAvatar(
+                                        radius: 28,
+                                        backgroundColor: Colors.blue[100],
+                                        child: Icon(
+                                          Icons.sticky_note_2,
+                                          color: Colors.blue[700],
+                                          size: 30,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 18),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                const Icon(
-                                                  Icons.access_time,
-                                                  size: 14,
-                                                  color: Colors.blueGrey,
+                                                Expanded(
+                                                  child: Text(
+                                                    note.title.isNotEmpty
+                                                        ? note.title
+                                                        : 'Sin título',
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 19,
+                                                      color: Colors.black87,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
                                                 ),
-                                                const SizedBox(width: 3),
-                                                Text(
-                                                  dateStr,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.blueGrey,
+                                                const SizedBox(width: 5),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 7,
+                                                        vertical: 1,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue[50],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.access_time,
+                                                        size: 14,
+                                                        color: Colors.blueGrey,
+                                                      ),
+                                                      const SizedBox(width: 3),
+                                                      Text(
+                                                        dateStr,
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color:
+                                                              Colors.blueGrey,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 7),
-                                      Expanded(
-                                        child: Text(
-                                          note.content,
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.black54,
-                                          ),
+                                            const SizedBox(height: 7),
+                                            Expanded(
+                                              child: Text(
+                                                note.content,
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -254,19 +340,52 @@ class HomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
+                        );
+                      },
+                    );
+                  }
+                  if (state is NoteError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return const SizedBox.shrink();
                 },
-              );
-            }
-            if (state is NoteError) {
-              return Center(child: Text(state.message));
-            }
-            return const SizedBox.shrink();
-          },
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class _CategoryIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _CategoryIcon({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: color.withOpacity(0.13),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }
@@ -278,7 +397,6 @@ class _CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Elimina el Container(width: drawerWidth, ...) y deja solo el Stack
     return Stack(
       fit: StackFit.expand,
       children: [
