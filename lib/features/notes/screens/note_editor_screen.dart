@@ -4,11 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
 import 'package:prueba/features/notes/models/note_model.dart';
+import 'package:prueba/core/widgets/category_icon.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   final Note? note;
-
   const NoteEditorScreen({super.key, this.note});
+
+  static const List<Map<String, dynamic>> kCategories = [
+    {'label': 'General', 'icon': Icons.notes, 'color': Colors.blueGrey},
+    {'label': 'Trabajo', 'icon': Icons.work, 'color': Colors.blue},
+    {'label': 'Escuela', 'icon': Icons.school, 'color': Colors.red},
+    {'label': 'Personal', 'icon': Icons.person, 'color': Colors.green},
+    // Agrega más si lo deseas
+  ];
 
   @override
   State<NoteEditorScreen> createState() => _NoteEditorScreenState();
@@ -18,6 +26,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   bool _saving = false;
+  late String _selectedCategory;
 
   @override
   void initState() {
@@ -26,6 +35,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentController = TextEditingController(
       text: widget.note?.content ?? '',
     );
+    _selectedCategory =
+        widget.note?.category ??
+        NoteEditorScreen.kCategories[0]['label'] as String;
   }
 
   Future<void> _saveNote() async {
@@ -48,6 +60,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           id: '',
           title: title,
           content: content,
+          category: _selectedCategory,
           createdAt: DateTime.now(),
         );
         context.read<NoteBloc>().add(AddNote(note, user.uid));
@@ -56,6 +69,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           id: widget.note!.id,
           title: title,
           content: content,
+          category: _selectedCategory,
           createdAt: widget.note!.createdAt,
         );
         context.read<NoteBloc>().add(UpdateNote(updatedNote));
@@ -164,7 +178,70 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       minLines: 8,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 18),
+                  // Selector de categoría
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Categoría',
+                      style: theme.textTheme.titleMedium!.copyWith(
+                        color: Colors.blueGrey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: 88,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children:
+                          NoteEditorScreen.kCategories.map((cat) {
+                            final isSelected =
+                                _selectedCategory == cat['label'];
+                            return GestureDetector(
+                              onTap:
+                                  () => setState(
+                                    () =>
+                                        _selectedCategory =
+                                            cat['label'] as String,
+                                  ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                  vertical: 2.0,
+                                ),
+                                child: Column(
+                                  children: [
+                                    CategoryIcon(
+                                      icon: cat['icon'],
+                                      label: cat['label'],
+                                      color: cat['color'],
+                                    ),
+                                    if (isSelected)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 2.0,
+                                        ),
+                                        child: Container(
+                                          width: 48,
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            color: cat['color'],
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ),
                   if (_saving)
                     const Padding(
                       padding: EdgeInsets.only(top: 10),

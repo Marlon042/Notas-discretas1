@@ -4,12 +4,14 @@ class CategoryIcon extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final bool selected;
 
   const CategoryIcon({
     super.key,
     required this.icon,
     required this.label,
     required this.color,
+    this.selected = false,
   });
 
   @override
@@ -19,14 +21,18 @@ class CategoryIcon extends StatelessWidget {
       child: Column(
         children: [
           CircleAvatar(
-            radius: 24,
-            backgroundColor: color.withOpacity(0.13),
-            child: Icon(icon, color: color, size: 28),
+            radius: selected ? 28 : 24,
+            backgroundColor: color.withOpacity(selected ? 0.22 : 0.13),
+            child: Icon(icon, color: color, size: selected ? 32 : 28),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: selected ? color : Colors.black,
+            ),
           ),
         ],
       ),

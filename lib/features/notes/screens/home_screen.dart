@@ -13,8 +13,23 @@ import 'package:prueba/features/notes/screens/note_editor_screen.dart';
 import 'package:prueba/features/profile/profile_screen.dart';
 import 'package:prueba/features/settings/settings_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  static const List<Map<String, dynamic>> kCategories = [
+    {'label': 'General', 'icon': Icons.notes, 'color': Colors.blueGrey},
+    {'label': 'Trabajo', 'icon': Icons.work, 'color': Colors.blue},
+    {'label': 'Escuela', 'icon': Icons.school, 'color': Colors.red},
+    {'label': 'Personal', 'icon': Icons.person, 'color': Colors.green},
+    // Puedes agregar más categorías aquí
+  ];
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String selectedCategory = 'Todas';
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +38,7 @@ class HomeScreen extends StatelessWidget {
       return const Center(child: Text('Usuario no autenticado'));
     }
 
+    // Cargar notas siempre que se construye (puedes mejorar esto si lo deseas)
     context.read<NoteBloc>().add(LoadNotes(user.uid));
 
     return Scaffold(
@@ -57,37 +73,20 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           backgroundColor: Colors.transparent,
-          // Puedes dejar el botón en AppBar o quitarlo, el FAB ya lo reemplaza
-          // actions: [
-          //   IconButton(
-          //     icon: const Icon(
-          //       Icons.add_circle_outline,
-          //       size: 30,
-          //       color: Colors.white,
-          //     ),
-          //     tooltip: 'Nueva Nota',
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
-          //       );
-          //     },
-          //   ),
-          // ],
         ),
       ),
       drawer: SizedBox(width: 260, child: _CustomDrawer(user: user)),
       backgroundColor: const Color(0xFFF2F6FC),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF4A6FA5), // Azul del gradiente
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        backgroundColor: const Color(0xFF4A6FA5),
         tooltip: 'Nueva Nota',
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
           );
-        },
+        }, // Azul del gradiente
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 90.0, left: 8, right: 8),
@@ -129,37 +128,48 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            // FILA DE ICONOS DE CATEGORIAS
+            // FILA DE ICONOS DE CATEGORIAS (ahora interactiva)
             SizedBox(
-              height: 72,
+              height: 88,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: const [
-                  CategoryIcon(
-                    icon: Icons.person,
-                    label: "Personal",
-                    color: Colors.blue,
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => selectedCategory = 'Todas'),
+                    child: Column(
+                      children: [
+                        CategoryIcon(
+                          icon: Icons.all_inclusive,
+                          label: "Todas",
+                          color: Colors.grey,
+                        ),
+                        if (selectedCategory == 'Todas')
+                          Container(width: 48, height: 4, color: Colors.grey),
+                      ],
+                    ),
                   ),
-                  CategoryIcon(
-                    icon: Icons.work,
-                    label: "Trabajo",
-                    color: Colors.green,
-                  ),
-                  CategoryIcon(
-                    icon: Icons.flight_takeoff,
-                    label: "Viajes",
-                    color: Colors.orange,
-                  ),
-                  CategoryIcon(
-                    icon: Icons.health_and_safety,
-                    label: "Salud",
-                    color: Colors.red,
-                  ),
-                  CategoryIcon(
-                    icon: Icons.add,
-                    label: "Agregar",
-                    color: Colors.grey,
-                  ),
+                  ...HomeScreen.kCategories.map((cat) {
+                    final isSelected = selectedCategory == cat['label'];
+                    return GestureDetector(
+                      onTap:
+                          () => setState(() => selectedCategory = cat['label']),
+                      child: Column(
+                        children: [
+                          CategoryIcon(
+                            icon: cat['icon'],
+                            label: cat['label'],
+                            color: cat['color'],
+                          ),
+                          if (isSelected)
+                            Container(
+                              width: 48,
+                              height: 4,
+                              color: cat['color'],
+                            ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ],
               ),
             ),
@@ -173,7 +183,14 @@ class HomeScreen extends StatelessWidget {
                   }
                   if (state is NoteLoaded) {
                     final notes = state.notes;
-                    if (notes.isEmpty) {
+                    final filteredNotes =
+                        selectedCategory == 'Todas'
+                            ? notes
+                            : notes
+                                .where((n) => n.category == selectedCategory)
+                                .toList();
+
+                    if (filteredNotes.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -185,7 +202,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 18),
                             const Text(
-                              'No tienes notas aún.',
+                              'No tienes notas en esta categoría.',
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.blueGrey,
@@ -203,13 +220,18 @@ class HomeScreen extends StatelessWidget {
                     }
                     return ListView.separated(
                       padding: const EdgeInsets.only(bottom: 90, top: 10),
-                      itemCount: notes.length,
+                      itemCount: filteredNotes.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 18),
                       itemBuilder: (context, index) {
-                        final note = notes[index];
+                        final note = filteredNotes[index];
                         final date = note.createdAt;
                         final dateStr =
                             '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}:${date.second.toString().padLeft(2, '0')}';
+
+                        final category = HomeScreen.kCategories.firstWhere(
+                          (c) => c['label'] == note.category,
+                          orElse: () => HomeScreen.kCategories[0],
+                        );
 
                         return GestureDetector(
                           onTap: () {
@@ -268,10 +290,11 @@ class HomeScreen extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         radius: 28,
-                                        backgroundColor: Colors.blue[100],
+                                        backgroundColor: category['color']
+                                            .withOpacity(0.13),
                                         child: Icon(
-                                          Icons.sticky_note_2,
-                                          color: Colors.blue[700],
+                                          category['icon'],
+                                          color: category['color'],
                                           size: 30,
                                         ),
                                       ),
