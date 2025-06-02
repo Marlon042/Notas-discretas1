@@ -72,7 +72,11 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
         ),
       ),
-      drawer: _CustomDrawer(user: user),
+      // <<<< CUSTOM WIDTH FOR DRAWER HERE!
+      drawer: SizedBox(
+        width: 260, // Cambia este valor para ajustar el ancho del Drawer
+        child: _CustomDrawer(user: user),
+      ),
       backgroundColor: const Color(0xFFF2F6FC),
       body: Padding(
         padding: const EdgeInsets.only(top: 90.0, left: 8, right: 8),
@@ -274,97 +278,96 @@ class _CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF4A6FA5), Color(0xFF003366)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+    // Elimina el Container(width: drawerWidth, ...) y deja solo el Stack
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF4A6FA5), Color(0xFF003366)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                decoration: const BoxDecoration(color: Colors.transparent),
-                currentAccountPicture: const CircleAvatar(
-                  radius: 32,
-                  backgroundImage: AssetImage(
-                    'assets/images/default_avatar.jpeg',
-                  ),
-                  backgroundColor: Colors.white,
+        ),
+        ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.transparent),
+              currentAccountPicture: const CircleAvatar(
+                radius: 32,
+                backgroundImage: AssetImage(
+                  'assets/images/default_avatar.jpeg',
                 ),
-                accountEmail: Text(
-                  user.email ?? '',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                accountName: const Text(
-                  'Usuario',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+                backgroundColor: Colors.white,
+              ),
+              accountEmail: Text(
+                user.email ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              _buildDrawerItem(
-                context,
-                icon: Icons.note,
-                text: 'Notas',
-                onTap: () => Navigator.pop(context),
+              accountName: const Text(
+                'Usuario',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              _buildDrawerItem(
-                context,
-                icon: Icons.person,
-                text: 'Perfil',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                  );
-                },
-              ),
-              _buildDrawerItem(
-                context,
-                icon: Icons.settings,
-                text: 'Configuración',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  );
-                },
-              ),
-              const Divider(color: Colors.white60, indent: 16, endIndent: 16),
-              _buildDrawerItem(
-                context,
-                icon: Icons.logout,
-                text: 'Cerrar sesión',
-                color: Colors.redAccent,
-                onTap: () async {
-                  Navigator.pop(context);
-                  context.read<AuthBloc>().add(SignOutRequested());
-                  await Future.delayed(const Duration(milliseconds: 200));
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/login',
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.note,
+              text: 'Notas',
+              onTap: () => Navigator.pop(context),
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.person,
+              text: 'Perfil',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.settings,
+              text: 'Configuración',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                );
+              },
+            ),
+            const Divider(color: Colors.white60, indent: 16, endIndent: 16),
+            _buildDrawerItem(
+              context,
+              icon: Icons.logout,
+              text: 'Cerrar sesión',
+              color: Colors.redAccent,
+              onTap: () async {
+                Navigator.pop(context);
+                context.read<AuthBloc>().add(SignOutRequested());
+                await Future.delayed(const Duration(milliseconds: 200));
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 
