@@ -2,7 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:prueba/core/widgets/category_icon.dart';
 import 'package:prueba/core/widgets/current_date_time_widget.dart';
+import 'package:prueba/core/widgets/note_detail_dialog.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
@@ -121,27 +123,27 @@ class HomeScreen extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: const [
-                  _CategoryIcon(
+                  CategoryIcon(
                     icon: Icons.person,
                     label: "Personal",
                     color: Colors.blue,
                   ),
-                  _CategoryIcon(
+                  CategoryIcon(
                     icon: Icons.work,
                     label: "Trabajo",
                     color: Colors.green,
                   ),
-                  _CategoryIcon(
+                  CategoryIcon(
                     icon: Icons.flight_takeoff,
                     label: "Viajes",
                     color: Colors.orange,
                   ),
-                  _CategoryIcon(
+                  CategoryIcon(
                     icon: Icons.health_and_safety,
                     label: "Salud",
                     color: Colors.red,
                   ),
-                  _CategoryIcon(
+                  CategoryIcon(
                     icon: Icons.add,
                     label: "Agregar",
                     color: Colors.grey,
@@ -202,7 +204,7 @@ class HomeScreen extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (context) {
-                                return _NoteDetailDialog(
+                                return NoteDetailDialog(
                                   note: note,
                                   dateStr: dateStr,
                                 );
@@ -359,39 +361,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _CategoryIcon extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _CategoryIcon({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: color.withOpacity(0.13),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _CustomDrawer extends StatelessWidget {
   final User user;
   const _CustomDrawer({required this.user});
@@ -514,66 +483,6 @@ class _CustomDrawer extends StatelessWidget {
       ),
       onTap: onTap,
       hoverColor: Colors.white24,
-    );
-  }
-}
-
-class _NoteDetailDialog extends StatelessWidget {
-  final dynamic note;
-  final String dateStr;
-
-  const _NoteDetailDialog({required this.note, required this.dateStr});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(
-        note.title.isNotEmpty ? note.title : 'Sin título',
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(note.content, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text(
-                  dateStr,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cerrar'),
-        ),
-        TextButton(
-          onPressed: () {
-            context.read<NoteBloc>().add(DeleteNote(note.id));
-            Navigator.pop(context);
-          },
-          child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => NoteEditorScreen(note: note)),
-            );
-          },
-          child: const Text('Editar'),
-        ),
-      ],
     );
   }
 }
