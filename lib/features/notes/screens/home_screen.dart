@@ -56,27 +56,39 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.add_circle_outline,
-                size: 30,
-                color: Colors.white,
-              ),
-              tooltip: 'Nueva Nota',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
-                );
-              },
-            ),
-          ],
           backgroundColor: Colors.transparent,
+          // Puedes dejar el botón en AppBar o quitarlo, el FAB ya lo reemplaza
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(
+          //       Icons.add_circle_outline,
+          //       size: 30,
+          //       color: Colors.white,
+          //     ),
+          //     tooltip: 'Nueva Nota',
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
+          //       );
+          //     },
+          //   ),
+          // ],
         ),
       ),
       drawer: SizedBox(width: 260, child: _CustomDrawer(user: user)),
       backgroundColor: const Color(0xFFF2F6FC),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF4A6FA5), // Azul del gradiente
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        tooltip: 'Nueva Nota',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
+          );
+        },
+      ),
       body: Padding(
         padding: const EdgeInsets.only(top: 90.0, left: 8, right: 8),
         child: Column(
@@ -197,7 +209,7 @@ class HomeScreen extends StatelessWidget {
                         final note = notes[index];
                         final date = note.createdAt;
                         final dateStr =
-                            '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+                            '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}:${date.second.toString().padLeft(2, '0')}';
 
                         return GestureDetector(
                           onTap: () {
@@ -410,7 +422,7 @@ class _CustomDrawer extends StatelessWidget {
             // Aquí la fecha y hora, fuera del header
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 18),
-              child: CurrentDateTimeWidget(),
+              child: CurrentDateTimeWidget(), // Widget de fecha y hora
             ),
             _buildDrawerItem(
               context,

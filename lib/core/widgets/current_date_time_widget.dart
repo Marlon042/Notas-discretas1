@@ -23,14 +23,14 @@ class CurrentDateTimeWidget extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.access_time, color: Colors.white, size: 20),
-              const SizedBox(width: 5),
+              const Icon(Icons.access_time, color: Colors.white, size: 35),
+              const SizedBox(width: 25),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
