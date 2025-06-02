@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:prueba/core/widgets/current_date_time_widget.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
@@ -412,10 +413,11 @@ class _CustomDrawer extends StatelessWidget {
         ListView(
           padding: EdgeInsets.zero,
           children: [
+            // Header con avatar, nombre y correo
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.transparent),
               currentAccountPicture: const CircleAvatar(
-                radius: 32,
+                radius: 28,
                 backgroundImage: AssetImage(
                   'assets/images/default_avatar.jpeg',
                 ),
@@ -435,6 +437,11 @@ class _CustomDrawer extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+            ),
+            // Aquí la fecha y hora, fuera del header
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 18),
+              child: CurrentDateTimeWidget(),
             ),
             _buildDrawerItem(
               context,
