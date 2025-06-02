@@ -8,7 +8,7 @@ import 'package:prueba/core/widgets/category_icon.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   final Note? note;
-  const NoteEditorScreen({super.key, this.note});
+  final String? initialCategory; // NUEVO
 
   static const List<Map<String, dynamic>> kCategories = [
     {'label': 'General', 'icon': Icons.notes, 'color': Colors.blueGrey},
@@ -17,6 +17,8 @@ class NoteEditorScreen extends StatefulWidget {
     {'label': 'Personal', 'icon': Icons.person, 'color': Colors.green},
     // Agrega más si lo deseas
   ];
+
+  const NoteEditorScreen({super.key, this.note, this.initialCategory});
 
   @override
   State<NoteEditorScreen> createState() => _NoteEditorScreenState();
@@ -35,9 +37,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentController = TextEditingController(
       text: widget.note?.content ?? '',
     );
-    _selectedCategory =
-        widget.note?.category ??
-        NoteEditorScreen.kCategories[0]['label'] as String;
+    if (widget.note != null) {
+      _selectedCategory = widget.note!.category;
+    } else if (widget.initialCategory != null) {
+      _selectedCategory = widget.initialCategory!;
+    } else {
+      _selectedCategory = NoteEditorScreen.kCategories[0]['label'] as String;
+    }
   }
 
   Future<void> _saveNote() async {
@@ -179,7 +185,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  // Selector de categoría
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -193,7 +198,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   ),
                   const SizedBox(height: 6),
                   SizedBox(
-                    height: 88,
+                    height: 88, // Ajustado para evitar overflow
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children:

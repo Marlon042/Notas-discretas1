@@ -44,14 +44,14 @@ class NoteDetailDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cerrar'),
+          child: const Text('CERRAR'),
         ),
         TextButton(
           onPressed: () {
             context.read<NoteBloc>().add(DeleteNote(note.id));
             Navigator.pop(context);
           },
-          child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+          child: const Text('ELIMINAR', style: TextStyle(color: Colors.red)),
         ),
         TextButton(
           onPressed: () {
@@ -61,7 +61,7 @@ class NoteDetailDialog extends StatelessWidget {
               MaterialPageRoute(builder: (_) => NoteEditorScreen(note: note)),
             );
           },
-          child: const Text('Editar'),
+          child: const Text('EDITAR'),
         ),
       ],
     );

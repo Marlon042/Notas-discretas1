@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Center(child: Text('Usuario no autenticado'));
     }
 
-    // Cargar notas siempre que se construye (puedes mejorar esto si lo deseas)
     context.read<NoteBloc>().add(LoadNotes(user.uid));
 
     return Scaffold(
@@ -78,15 +77,21 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: SizedBox(width: 260, child: _CustomDrawer(user: user)),
       backgroundColor: const Color(0xFFF2F6FC),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF4A6FA5),
+        backgroundColor: const Color(0xFF4A6FA5), // Azul del gradiente
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
         tooltip: 'Nueva Nota',
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const NoteEditorScreen()),
+            MaterialPageRoute(
+              builder:
+                  (_) => NoteEditorScreen(
+                    initialCategory:
+                        selectedCategory == "Todas" ? null : selectedCategory,
+                  ),
+            ),
           );
-        }, // Azul del gradiente
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 90.0, left: 8, right: 8),
@@ -130,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             // FILA DE ICONOS DE CATEGORIAS (ahora interactiva)
             SizedBox(
-              height: 88,
+              height: 88, // Ajustado para evitar overflow
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
