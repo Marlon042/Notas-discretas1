@@ -1,4 +1,3 @@
-// lib/features/notes/screens/note_editor_screen.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,37 +6,62 @@ import 'package:prueba/features/notes/bloc/note_event.dart';
 import 'package:prueba/features/notes/models/note_model.dart';
 
 class NoteEditorScreen extends StatefulWidget {
-  const NoteEditorScreen({super.key});
+  final Note? note; // <-- NUEVO: parámetro opcional para nota existente
+
+  const NoteEditorScreen({super.key, this.note});
 
   @override
   State<NoteEditorScreen> createState() => _NoteEditorScreenState();
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.note?.title ?? '');
+    _contentController = TextEditingController(
+      text: widget.note?.content ?? '',
+    );
+  }
 
   Future<void> _saveNote() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
+
     if (title.isEmpty && content.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('La nota está vacía')));
       return;
     }
+
     setState(() => _saving = true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('Usuario no autenticado');
-      final note = Note(
-        id: '', // Firestore asigna el id
-        title: title,
-        content: content,
-        createdAt: DateTime.now(),
-      );
-      context.read<NoteBloc>().add(AddNote(note, user.uid));
+      if (widget.note == null) {
+        // CREAR
+        final note = Note(
+          id: '',
+          title: title,
+          content: content,
+          createdAt: DateTime.now(),
+        );
+        context.read<NoteBloc>().add(AddNote(note, user.uid));
+      } else {
+        // EDITAR
+        final updatedNote = Note(
+          id: widget.note!.id,
+          title: title,
+          content: content,
+          createdAt: widget.note!.createdAt,
+        );
+        context.read<NoteBloc>().add(UpdateNote(updatedNote));
+      }
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(
@@ -50,9 +74,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.note != null;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nueva nota'),
+        title: Text(isEditing ? 'Editar nota' : 'Nueva nota'),
         actions: [
           IconButton(
             icon:
@@ -67,7 +92,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     )
                     : const Icon(Icons.save),
             onPressed: _saving ? null : _saveNote,
-            tooltip: 'Guardar nota',
+            tooltip: isEditing ? 'Guardar cambios' : 'Guardar nota',
           ),
         ],
       ),

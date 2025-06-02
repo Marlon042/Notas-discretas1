@@ -5,6 +5,7 @@ import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
 import 'package:prueba/features/notes/bloc/note_state.dart';
+import 'package:prueba/features/notes/screens/note_editor_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -176,6 +177,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    // ... (mantén el resto del archivo igual)
                     onTap: () {
                       showDialog(
                         context: context,
@@ -232,6 +234,20 @@ class HomeScreen extends StatelessWidget {
                                   'Eliminar',
                                   style: TextStyle(color: Colors.red),
                                 ),
+                              ),
+                              // NUEVO BOTÓN EDITAR
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Cierra el diálogo
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => NoteEditorScreen(note: note),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Editar'),
                               ),
                             ],
                           );
