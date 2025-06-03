@@ -11,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -20,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -44,6 +46,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 24),
+                // Campo de nombre o alias
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre o alias',
+                    prefixIcon: const Icon(Icons.person_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu nombre o alias';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
                 // Campo de email
                 TextFormField(
                   controller: _emailController,
@@ -210,6 +230,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   if (_formKey.currentState!.validate()) {
                                     context.read<AuthBloc>().add(
                                       SignUpRequested(
+                                        name: _nameController.text.trim(),
                                         email: _emailController.text.trim(),
                                         password:
                                             _passwordController.text.trim(),

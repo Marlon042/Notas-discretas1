@@ -17,7 +17,11 @@ class AuthLoading extends AuthState {
 }
 
 class AuthSuccess extends AuthState {
-  const AuthSuccess(User user) : super(user: user);
+  final String name;
+  const AuthSuccess(User user, this.name) : super(user: user);
+
+  @override
+  List<Object?> get props => [user, name];
 }
 
 class RegistrationSuccess extends AuthState {

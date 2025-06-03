@@ -21,11 +21,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final user = await authRepository.signInWithEmailAndPassword(
+      final result = await authRepository.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      emit(AuthSuccess(user!));
+      emit(AuthSuccess(result!['user'], result['name']));
     } catch (e) {
       emit(AuthFailure(_mapAuthError(e.toString())));
     }
@@ -38,6 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final user = await authRepository.signUpWithEmailAndPassword(
+        name: event.name,
         email: event.email,
         password: event.password,
       );
@@ -56,16 +57,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   String _mapAuthError(String error) {
-    if (error.contains('weak-password')) {
+    if (error.contains('weak-password') ||
+        error.contains('[firebase_auth/weak-password]')) {
       return 'La contraseña es demasiado débil';
-    } else if (error.contains('email-already-in-use')) {
+    } else if (error.contains('email-already-in-use') ||
+        error.contains('[firebase_auth/email-already-in-use]')) {
       return 'El correo ya está en uso';
-    } else if (error.contains('invalid-email')) {
+    } else if (error.contains('invalid-email') ||
+        error.contains('[firebase_auth/invalid-email]')) {
       return 'Correo electrónico inválido';
-    } else if (error.contains('user-not-found')) {
-      return 'Usuario no encontrado';
-    } else if (error.contains('wrong-password')) {
+    } else if (error.contains('user-not-found') ||
+        error.contains('[firebase_auth/user-not-found]')) {
+      return 'Correo no encontrado o no existe en el sistema';
+    } else if (error.contains('wrong-password') ||
+        error.contains('[firebase_auth/wrong-password]')) {
       return 'Contraseña incorrecta';
+    } else if (error.contains('auth credential is incorrect') ||
+        error.contains('malformed or has expired')) {
+      return 'Las credenciales son incorrectas o han expirado';
     }
     return 'Error de autenticación';
   }

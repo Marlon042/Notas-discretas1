@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ];
 
   String? _selectedAvatar;
+  String? _userName;
   bool _loadingAvatar = true;
 
   @override
@@ -52,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .get();
     setState(() {
       _selectedAvatar = doc.data()?['avatar'] as String?;
+      _userName = doc.data()?['name'] as String?;
       _loadingAvatar = false;
     });
   }

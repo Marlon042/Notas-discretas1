@@ -133,6 +133,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlocConsumer<AuthBloc, AuthState>(
                   listener: (context, state) {
                     if (state is AuthSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Bienvenido ${state.name}'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                       Navigator.pushReplacementNamed(context, '/home');
                     }
                     if (state is AuthFailure) {
