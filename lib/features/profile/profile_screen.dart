@@ -81,22 +81,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => Navigator.pushNamed(context, '/edit-profile'),
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: AppBar(
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF4A6FA5), Color(0xFF003366)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
-        ],
+          backgroundColor: Colors.transparent,
+          title: const Text(
+            'Mi Perfil',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              shadows: [
+                Shadow(
+                  blurRadius: 8,
+                  color: Colors.black38,
+                  offset: Offset(1, 2),
+                ),
+              ],
+            ),
+          ),
+          centerTitle: true,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child:
-            _loadingAvatar
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
+      backgroundColor: const Color(0xFFF2F6FC),
+      body:
+          _loadingAvatar
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
                   children: [
+                    // Espacio para evitar que el avatar choque con el AppBar extendido
+                    const SizedBox(height: 110),
                     // Avatar
                     Stack(
                       alignment: Alignment.bottomRight,
@@ -128,9 +155,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      user?.displayName ?? 'Discrete User',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                    Column(
+                      children: [
+                        Text(
+                          (_userName != null && _userName!.isNotEmpty)
+                              ? _userName!
+                              : (user?.displayName?.isNotEmpty == true
+                                  ? user!.displayName!
+                                  : 'Usuario sin nombre'),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color(0xFF4A6FA5),
+                          ),
+                          tooltip: 'Editar nombre',
+                          onPressed: () async {
+                            final newName = await showDialog<String>(
+                              context: context,
+                              builder: (context) {
+                                final controller = TextEditingController(
+                                  text: _userName ?? '',
+                                );
+                                return AlertDialog(
+                                  title: const Text('Editar nombre'),
+                                  content: TextField(
+                                    controller: controller,
+                                    maxLength: 40,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nombre o alias',
+                                      counterText: '',
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        final value = controller.text.trim();
+                                        if (value.isNotEmpty &&
+                                            value.length <= 40) {
+                                          final user =
+                                              context
+                                                  .read<AuthBloc>()
+                                                  .state
+                                                  .user;
+                                          await FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(user!.uid)
+                                              .set({
+                                                'name': value,
+                                              }, SetOptions(merge: true));
+                                          Navigator.pop(context, value);
+                                        }
+                                      },
+                                      child: const Text('Guardar'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            if (newName != null && newName.isNotEmpty) {
+                              setState(() {
+                                _userName = newName;
+                              });
+                            }
+                          },
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -143,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildSettingsCard(context),
                   ],
                 ),
-      ),
+              ),
     );
   }
 
