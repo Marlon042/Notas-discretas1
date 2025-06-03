@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// Importación necesaria para Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/core/widgets/category_icon.dart';
 import 'package:prueba/core/widgets/current_date_time_widget.dart';
@@ -425,12 +427,44 @@ class _CustomDrawer extends StatelessWidget {
             // Header con avatar, nombre y correo
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.transparent),
-              currentAccountPicture: const CircleAvatar(
-                radius: 28,
-                backgroundImage: AssetImage(
-                  'assets/images/default_avatar.jpeg',
-                ),
-                backgroundColor: Colors.white,
+              currentAccountPicture: FutureBuilder<DocumentSnapshot>(
+                future:
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Colors.grey,
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.data() == null) {
+                    return const CircleAvatar(
+                      radius: 28,
+                      backgroundImage: AssetImage(
+                        'assets/images/default_avatar.jpeg',
+                      ),
+                      backgroundColor: Colors.white,
+                    );
+                  }
+                  final data = snapshot.data!.data() as Map<String, dynamic>;
+                  final avatarPath = data['avatar'] as String?;
+                  return CircleAvatar(
+                    radius: 28,
+                    backgroundImage:
+                        avatarPath != null
+                            ? AssetImage(avatarPath)
+                            : const AssetImage(
+                              'assets/images/default_avatar.jpeg',
+                            ),
+                    backgroundColor: Colors.white,
+                  );
+                },
               ),
               accountEmail: Text(
                 user.email ?? '',
@@ -439,12 +473,43 @@ class _CustomDrawer extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              accountName: const Text(
-                'Usuario',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              accountName: FutureBuilder<DocumentSnapshot>(
+                future:
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text(
+                      'Cargando...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.data() == null) {
+                    return const Text(
+                      'Usuario',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    );
+                  }
+                  final data = snapshot.data!.data() as Map<String, dynamic>;
+                  final userName = data['name'] as String?;
+                  return Text(
+                    userName ?? 'Usuario',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  );
+                },
               ),
             ),
             // Aquí la fecha y hora, fuera del header
