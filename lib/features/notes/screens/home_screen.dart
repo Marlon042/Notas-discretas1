@@ -580,11 +580,13 @@ class _CustomDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 context.read<AuthBloc>().add(SignOutRequested());
                 await Future.delayed(const Duration(milliseconds: 200));
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/login',
-                  (route) => false,
-                );
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                }
               },
             ),
           ],
