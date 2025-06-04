@@ -12,7 +12,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Listas de avatares (asegúrate de tener estas imágenes en assets/images/)
   final List<String> maleAvatars = [
     'assets/images/male_avatar1.png',
     'assets/images/male_avatar2.png',
@@ -71,7 +70,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final user = context.read<AuthBloc>().state.user;
 
-    // Si el usuario ya tiene un avatar, úsalo; si no, usa el seleccionado localmente o el default
     ImageProvider avatarImage;
     if (user?.photoURL != null) {
       avatarImage = NetworkImage(user!.photoURL!);
@@ -123,9 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    // Espacio para evitar que el avatar choque con el AppBar extendido
                     const SizedBox(height: 110),
-                    // Avatar
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
