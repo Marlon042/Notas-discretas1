@@ -31,6 +31,10 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<UpdateNote>((event, emit) async {
       try {
         await noteRepository.updateNote(event.note);
+        // Recargar las notas después de actualizar
+        if (event.note is Note && event.note.userId != null) {
+          add(LoadNotes(event.note.userId));
+        }
         emit(NoteDeselected());
       } catch (e) {
         emit(NoteError('Error al actualizar nota'));

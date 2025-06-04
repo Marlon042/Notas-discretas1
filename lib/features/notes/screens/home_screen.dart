@@ -83,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Icon(Icons.add, color: Colors.white, size: 32),
         tooltip: 'Nueva Nota',
         onPressed: () {
+          final user = FirebaseAuth.instance.currentUser;
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -92,7 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         selectedCategory == "Todas" ? null : selectedCategory,
                   ),
             ),
-          );
+          ).then((_) {
+            if (user != null) {
+              context.read<NoteBloc>().add(LoadNotes(user.uid));
+            }
+          });
         },
       ),
       body: Padding(
