@@ -185,6 +185,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: BlocBuilder<NoteBloc, NoteState>(
                 builder: (context, state) {
+                  if (state is NoteDeselected) {
+                    // Cierra cualquier diálogo abierto y refresca la UI si es necesario
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  }
                   if (state is NoteLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }

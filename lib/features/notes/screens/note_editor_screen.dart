@@ -79,6 +79,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           createdAt: widget.note!.createdAt,
         );
         context.read<NoteBloc>().add(UpdateNote(updatedNote));
+        context.read<NoteBloc>().add(DeselectNote());
       }
       Navigator.pop(context, true);
     } catch (e) {
