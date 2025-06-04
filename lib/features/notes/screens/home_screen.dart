@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Importación necesaria para Firestore
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/core/avatar_notifier.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +23,6 @@ class HomeScreen extends StatefulWidget {
     {'label': 'Trabajo', 'icon': Icons.work, 'color': Colors.blue},
     {'label': 'Escuela', 'icon': Icons.school, 'color': Colors.red},
     {'label': 'Personal', 'icon': Icons.person, 'color': Colors.green},
-    // Puedes agregar más categorías aquí
   ];
 
   @override
@@ -121,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       backgroundColor: const Color(0xFFF2F6FC),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF4A6FA5), // Azul del gradiente
+        backgroundColor: const Color(0xFF4A6FA5),
         child: const Icon(Icons.add, color: Colors.white, size: 32),
         tooltip: 'Nueva Nota',
         onPressed: () {
@@ -147,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // BARRA DE BUSQUEDA
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
@@ -165,11 +162,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                // TODO: Implementar búsqueda si lo deseas
+                onChanged: (value) {
+                  context.read<NoteBloc>().add(SearchNotes(value));
+                },
               ),
             ),
             const SizedBox(height: 12),
-            // "CATEGORIAS"
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 6.0),
               child: Text(
@@ -182,9 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            // FILA DE ICONOS DE CATEGORIAS (ahora interactiva)
             SizedBox(
-              height: 88, // Ajustado para evitar overflow
+              height: 88,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -228,12 +225,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            // NOTAS (usa tu BlocBuilder aquí)
             Expanded(
               child: BlocBuilder<NoteBloc, NoteState>(
                 builder: (context, state) {
                   if (state is NoteDeselected) {
-                    // Cierra cualquier diálogo abierto y refresca la UI si es necesario
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context);
                     }
@@ -484,7 +479,6 @@ class _CustomDrawer extends StatelessWidget {
         ListView(
           padding: EdgeInsets.zero,
           children: [
-            // Header con avatar, nombre y correo
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.transparent),
               currentAccountPicture: ValueListenableBuilder<String>(
@@ -535,10 +529,9 @@ class _CustomDrawer extends StatelessWidget {
                 },
               ),
             ),
-            // Aquí la fecha y hora, fuera del header
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 18),
-              child: CurrentDateTimeWidget(), // Widget de fecha y hora
+              child: CurrentDateTimeWidget(),
             ),
             _buildDrawerItem(
               context,

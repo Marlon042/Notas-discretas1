@@ -20,6 +20,18 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
       }
     });
 
+    on<SearchNotes>((event, emit) async {
+      emit(NoteLoading());
+      try {
+        final filteredNotes = await noteRepository.searchNotesByTitle(
+          event.title,
+        );
+        emit(NoteLoaded(filteredNotes));
+      } catch (e) {
+        emit(NoteError('Error al buscar notas'));
+      }
+    });
+
     on<AddNote>((event, emit) async {
       try {
         await noteRepository.addNote(event.note, event.userId);

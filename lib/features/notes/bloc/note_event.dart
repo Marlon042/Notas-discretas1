@@ -7,6 +7,15 @@ abstract class NoteEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class SearchNotes extends NoteEvent {
+  final String title;
+
+  const SearchNotes(this.title);
+
+  @override
+  List<Object?> get props => [title];
+}
+
 class DeleteNote extends NoteEvent {
   final String noteId;
 
