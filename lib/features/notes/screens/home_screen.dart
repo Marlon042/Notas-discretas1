@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // Importación necesaria para Firestore
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:prueba/core/avatar_notifier.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/core/widgets/category_icon.dart';
 import 'package:prueba/core/widgets/current_date_time_widget.dart';
@@ -33,11 +34,45 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String selectedCategory = 'Todas';
 
+  String? _avatarPath;
+  String? _userName;
+  bool _loadingUser = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setState(() {
+        _loadingUser = false;
+      });
+      return;
+    }
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+    setState(() {
+      _avatarPath = doc.data()?['avatar'] as String?;
+      _userName = doc.data()?['name'] as String?;
+      _loadingUser = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       return const Center(child: Text('Usuario no autenticado'));
+    }
+
+    if (_loadingUser) {
+      return const Center(child: CircularProgressIndicator());
     }
 
     context.read<NoteBloc>().add(LoadNotes(user.uid));
@@ -76,7 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.transparent,
         ),
       ),
-      drawer: SizedBox(width: 260, child: _CustomDrawer(user: user)),
+      drawer: SizedBox(
+        width: 260,
+        child: _CustomDrawer(
+          user: user,
+          avatarPath: _avatarPath,
+          userName: _userName,
+        ),
+      ),
       backgroundColor: const Color(0xFFF2F6FC),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF4A6FA5), // Azul del gradiente
@@ -416,7 +458,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _CustomDrawer extends StatelessWidget {
   final User user;
-  const _CustomDrawer({required this.user});
+  final String? avatarPath;
+  final String? userName;
+
+  const _CustomDrawer({
+    required this.user,
+    required this.avatarPath,
+    required this.userName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -438,41 +487,16 @@ class _CustomDrawer extends StatelessWidget {
             // Header con avatar, nombre y correo
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.transparent),
-              currentAccountPicture: FutureBuilder<DocumentSnapshot>(
-                future:
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .get(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.grey,
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data!.data() == null) {
-                    return const CircleAvatar(
-                      radius: 28,
-                      backgroundImage: AssetImage(
-                        'assets/images/default_avatar.jpeg',
-                      ),
-                      backgroundColor: Colors.white,
-                    );
-                  }
-                  final data = snapshot.data!.data() as Map<String, dynamic>;
-                  final avatarPath = data['avatar'] as String?;
+              currentAccountPicture: ValueListenableBuilder<String>(
+                valueListenable: AvatarNotifier.avatarPath,
+                builder: (context, avatarValue, _) {
+                  final String path =
+                      avatarValue.isNotEmpty
+                          ? avatarValue
+                          : (avatarPath ?? 'assets/images/default_avatar.jpeg');
                   return CircleAvatar(
                     radius: 28,
-                    backgroundImage:
-                        avatarPath != null
-                            ? AssetImage(avatarPath)
-                            : const AssetImage(
-                              'assets/images/default_avatar.jpeg',
-                            ),
+                    backgroundImage: AssetImage(path),
                     backgroundColor: Colors.white,
                   );
                 },
@@ -484,43 +508,12 @@ class _CustomDrawer extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              accountName: FutureBuilder<DocumentSnapshot>(
-                future:
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .get(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Text(
-                      'Cargando...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    );
-                  }
-                  if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data!.data() == null) {
-                    return const Text(
-                      'Usuario',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    );
-                  }
-                  final data = snapshot.data!.data() as Map<String, dynamic>;
-                  final userName = data['name'] as String?;
-                  return Text(
-                    userName ?? 'Usuario',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  );
-                },
+              accountName: Text(
+                userName ?? 'Usuario',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             // Aquí la fecha y hora, fuera del header
