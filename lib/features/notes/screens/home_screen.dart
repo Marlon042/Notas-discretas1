@@ -508,12 +508,31 @@ class _CustomDrawer extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              accountName: Text(
-                userName ?? 'Usuario',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              accountName: StreamBuilder<DocumentSnapshot>(
+                stream:
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final name = snapshot.data?.get('name') ?? 'Usuario';
+                    return Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    );
+                  }
+                  return Text(
+                    userName ?? 'Usuario',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  );
+                },
               ),
             ),
             // Aquí la fecha y hora, fuera del header
