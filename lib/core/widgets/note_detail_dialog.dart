@@ -16,54 +16,118 @@ class NoteDetailDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(
-        note.title.isNotEmpty ? note.title : 'Sin título',
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      ),
-      content: SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.yellow[100],
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(note.content, style: const TextStyle(fontSize: 16)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  note.title.isNotEmpty ? note.title : 'Sin título',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.brown,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Confirmar eliminación'),
+                          content: const Text(
+                            '¿Estás seguro de que deseas eliminar esta nota?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('No'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                context.read<NoteBloc>().add(
+                                  DeleteNote(note.id),
+                                );
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'Sí',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              note.content,
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
+            ),
             const SizedBox(height: 16),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                const Icon(Icons.calendar_today, size: 16, color: Colors.brown),
                 const SizedBox(width: 6),
                 Text(
                   dateStr,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.brown),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cerrar'),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NoteEditorScreen(note: note),
+                      ),
+                    ).then((_) {
+                      context.read<NoteBloc>().add(DeselectNote());
+                    });
+                  },
+                  child: const Text('Editar'),
                 ),
               ],
             ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('CERRAR'),
-        ),
-        TextButton(
-          onPressed: () {
-            context.read<NoteBloc>().add(DeleteNote(note.id));
-            Navigator.pop(context);
-          },
-          child: const Text('ELIMINAR', style: TextStyle(color: Colors.red)),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => NoteEditorScreen(note: note)),
-            );
-          },
-          child: const Text('EDITAR'),
-        ),
-      ],
     );
   }
 }

@@ -31,6 +31,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<UpdateNote>((event, emit) async {
       try {
         await noteRepository.updateNote(event.note);
+        emit(NoteDeselected());
       } catch (e) {
         emit(NoteError('Error al actualizar nota'));
       }
@@ -42,6 +43,9 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
       } catch (e) {
         emit(NoteError('Error al eliminar nota'));
       }
+    });
+    on<DeselectNote>((event, emit) {
+      emit(NoteDeselected());
     });
   }
 }
