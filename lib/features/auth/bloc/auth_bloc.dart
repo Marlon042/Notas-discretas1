@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:prueba/features/auth/repositories/auth_repository.dart';
+import 'package:prueba/core/avatar_notifier.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -25,7 +27,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-      emit(AuthSuccess(result!['user'], result['name']));
+      // Recuperar el avatar del usuario desde Firestore
+      final user = result!['user'];
+      final name = result['name'];
+      String avatarPath = 'assets/images/default_avatar.jpeg';
+      try {
+        final doc =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .get();
+        if (doc.exists && doc.data()?['avatar'] != null) {
+          avatarPath = doc.data()!['avatar'] as String;
+        }
+      } catch (_) {}
+      AvatarNotifier.avatarPath.value = avatarPath;
+      emit(AuthSuccess(user, name));
     } catch (e) {
       emit(AuthFailure(_mapAuthError(e.toString())));
     }
@@ -53,6 +70,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await authRepository.signOut();
+    // Reinicia el avatar al cerrar sesión
+    AvatarNotifier.avatarPath.value = 'assets/images/default_avatar.jpeg';
     emit(AuthInitial());
   }
 
