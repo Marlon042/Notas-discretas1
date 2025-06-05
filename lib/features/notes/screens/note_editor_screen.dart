@@ -61,6 +61,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('Usuario no autenticado');
+      debugPrint('Usuario autenticado: ${user.uid}');
+
+      // Eliminado manejo de conectividad y logs relacionados
+
       if (widget.note == null) {
         final note = Note(
           id: '',
@@ -70,6 +74,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           userId: user.uid, // Agregado userId
           createdAt: DateTime.now(),
         );
+        debugPrint('Creando nueva nota: $note');
         context.read<NoteBloc>().add(AddNote(note, user.uid));
       } else {
         final updatedNote = Note(
@@ -80,11 +85,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           userId: widget.note!.userId, // Agregado userId
           createdAt: widget.note!.createdAt,
         );
+        debugPrint('Actualizando nota existente: $updatedNote');
         context.read<NoteBloc>().add(UpdateNote(updatedNote));
         context.read<NoteBloc>().add(DeselectNote());
       }
+
+      // Eliminado manejo de Snackbars para sincronización
+
       Navigator.pop(context, true);
     } catch (e) {
+      debugPrint('Error al guardar nota: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
@@ -107,6 +117,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         return true;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset:
+            true, // Permitir que el diseño se ajuste al teclado
         backgroundColor: Colors.blueGrey[50],
         appBar: AppBar(
           backgroundColor: Colors.blue[700],
@@ -141,6 +153,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         ),
         body: Center(
           child: SingleChildScrollView(
+            physics:
+                const BouncingScrollPhysics(), // Agregar desplazamiento suave
             padding: const EdgeInsets.all(24),
             child: Card(
               elevation: 9,
