@@ -114,9 +114,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       backgroundColor: const Color(0xFFF2F6FC),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xFF4A6FA5),
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        icon: const Icon(Icons.add, color: Colors.white, size: 32),
+        label: const Text(
+          'Nueva Nota',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
         tooltip: 'Nueva Nota',
         onPressed: () {
           final user = FirebaseAuth.instance.currentUser;
