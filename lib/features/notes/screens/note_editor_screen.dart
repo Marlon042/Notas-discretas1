@@ -67,6 +67,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           title: title,
           content: content,
           category: _selectedCategory,
+          userId: user.uid, // Agregado userId
           createdAt: DateTime.now(),
         );
         context.read<NoteBloc>().add(AddNote(note, user.uid));
@@ -76,6 +77,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           title: title,
           content: content,
           category: _selectedCategory,
+          userId: widget.note!.userId, // Agregado userId
           createdAt: widget.note!.createdAt,
         );
         context.read<NoteBloc>().add(UpdateNote(updatedNote));

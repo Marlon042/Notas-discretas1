@@ -10,12 +10,17 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
   NoteBloc(this.noteRepository) : super(NoteInitial()) {
     on<LoadNotes>((event, emit) async {
       emit(NoteLoading());
+      print('Estado NoteLoading emitido');
       try {
         await emit.forEach<List<Note>>(
           noteRepository.getNotes(event.userId),
-          onData: (notes) => NoteLoaded(notes),
+          onData: (notes) {
+            print('Notas cargadas: $notes');
+            return NoteLoaded(notes);
+          },
         );
       } catch (e) {
+        print('Error al cargar notas: $e');
         emit(NoteError('Error al cargar notas'));
       }
     });
@@ -42,14 +47,26 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
 
     on<UpdateNote>((event, emit) async {
       try {
+        print('Evento UpdateNote recibido: ${event.note}');
         await noteRepository.updateNote(event.note);
+        print('Nota actualizada correctamente: ${event.note}');
         // Recargar las notas después de actualizar
         if (event.note is Note && event.note.userId != null) {
+          print(
+            'Disparando evento LoadNotes para userId: ${event.note.userId}',
+          );
           add(LoadNotes(event.note.userId));
         }
-        emit(NoteDeselected());
+        emit(
+          NoteLoaded(await noteRepository.getNotes(event.note.userId!).first),
+        );
+        print('Estado NoteLoaded emitido después de actualizar');
       } catch (e) {
-        emit(NoteError('Error al actualizar nota'));
+        if (event.note.id.isNotEmpty) {
+          emit(NoteError('Error al actualizar nota: $e'));
+        } else {
+          print('Error ignorado porque la nota no fue guardada.');
+        }
       }
     });
 

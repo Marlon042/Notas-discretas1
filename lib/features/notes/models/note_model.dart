@@ -5,6 +5,7 @@ class Note {
   final String title;
   final String content;
   final String category; // Nuevo campo
+  final String userId; // Campo agregado
   final DateTime createdAt;
 
   Note({
@@ -12,6 +13,7 @@ class Note {
     required this.title,
     required this.content,
     required this.category, // Nuevo campo requerido
+    required this.userId, // Nuevo campo requerido
     required this.createdAt,
   });
 
@@ -21,6 +23,7 @@ class Note {
       title: data['title'] ?? '',
       content: data['content'] ?? '',
       category: data['category'] ?? 'General', // Default si no existe
+      userId: data['userId'] ?? '', // Default vacío si no existe
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -30,6 +33,7 @@ class Note {
       'title': title,
       'content': content,
       'category': category, // Guardar la categoría
+      'userId': userId, // Guardar el userId
       'createdAt': createdAt,
     };
   }
