@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:prueba/core/widgets/category_icon.dart';
+import 'package:prueba/features/notes/widgets/note_search_bar.dart';
+import 'package:prueba/features/notes/widgets/category_selector.dart';
 import 'package:prueba/core/widgets/note_detail_dialog.dart';
 import 'package:prueba/core/widgets/custom_drawer.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
@@ -149,84 +150,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Buscar notas...',
-                  prefixIcon: Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 0,
-                    horizontal: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onChanged: (value) {
-                  context.read<NoteBloc>().add(SearchNotes(value));
-                },
-              ),
-            ),
+            const NoteSearchBar(),
             const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6.0),
-              child: Text(
-                'Categorías',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 88,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  GestureDetector(
-                    onTap: () => setState(() => selectedCategory = 'Todas'),
-                    child: Column(
-                      children: [
-                        CategoryIcon(
-                          icon: Icons.all_inclusive,
-                          label: "Todas",
-                          color: Colors.grey,
-                        ),
-                        if (selectedCategory == 'Todas')
-                          Container(width: 48, height: 4, color: Colors.grey),
-                      ],
-                    ),
-                  ),
-                  ...HomeScreen.kCategories.map((cat) {
-                    final isSelected = selectedCategory == cat['label'];
-                    return GestureDetector(
-                      onTap:
-                          () => setState(() => selectedCategory = cat['label']),
-                      child: Column(
-                        children: [
-                          CategoryIcon(
-                            icon: cat['icon'],
-                            label: cat['label'],
-                            color: cat['color'],
-                          ),
-                          if (isSelected)
-                            Container(
-                              width: 48,
-                              height: 4,
-                              color: cat['color'],
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ),
+            CategorySelector(
+              selectedCategory: selectedCategory,
+              onCategorySelected: (category) {
+                setState(() {
+                  selectedCategory = category;
+                });
+              },
             ),
             const SizedBox(height: 8),
             Expanded(
