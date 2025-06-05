@@ -136,8 +136,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
             ),
           ).then((_) {
-            if (user != null) {
-              context.read<NoteBloc>().add(LoadNotes(user.uid));
+            if (user != null && mounted) {
+              setState(() {
+                context.read<NoteBloc>().add(LoadNotes(user.uid));
+              });
             }
           });
         },
