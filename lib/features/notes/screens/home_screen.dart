@@ -115,7 +115,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       backgroundColor: const Color(0xFFF2F6FC),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFF4A6FA5),
+        backgroundColor: const Color(
+          0xFF4A6FA5,
+        ).withAlpha((0.85 * 255).toInt()),
         icon: const Icon(Icons.add, color: Colors.white, size: 32),
         label: const Text(
           'Nueva Nota',
