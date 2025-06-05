@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:prueba/core/avatar_notifier.dart';
+import 'package:prueba/core/widgets/avatar_notifier.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/core/widgets/category_icon.dart';
 import 'package:prueba/core/widgets/current_date_time_widget.dart';

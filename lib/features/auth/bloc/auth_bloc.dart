@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:prueba/features/auth/repositories/auth_repository.dart';
-import 'package:prueba/core/avatar_notifier.dart';
+import 'package:prueba/core/widgets/avatar_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'auth_event.dart';

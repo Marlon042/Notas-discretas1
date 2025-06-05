@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:prueba/core/avatar_notifier.dart';
+import 'package:prueba/core/widgets/avatar_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

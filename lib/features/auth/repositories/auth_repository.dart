@@ -46,7 +46,7 @@ class AuthRepository {
         'createdAt': DateTime.now(),
       });
       return userCredential.user;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       throw Exception('Error desconocido al registrarse');
