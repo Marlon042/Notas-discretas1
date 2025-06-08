@@ -22,7 +22,7 @@ class CurrentDateTimeWidget extends StatelessWidget {
             "${now.second.toString().padLeft(2, '0')}";
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
+            color: Colors.white.withAlpha((0.12 * 255).round()),
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
