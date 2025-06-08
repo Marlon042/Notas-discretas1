@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/core/widgets/avatar_notifier.dart';
+import 'package:prueba/features/security/screens/change_password_screen.dart';
 import 'package:prueba/core/services/firebase_messaging_service.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -167,10 +168,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                         ),
-                        IconButton(
+                        TextButton.icon(
                           icon: const Icon(
                             Icons.edit,
                             color: Color(0xFF4A6FA5),
+                          ),
+                          label: const Text(
+                            'Cambiar nombre',
+                            style: TextStyle(
+                              color: Color(0xFF4A6FA5),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           tooltip: 'Editar nombre',
                           onPressed: () async {
@@ -333,7 +341,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.security),
             title: const Text('Seguridad'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.pushNamed(context, '/security'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChangePasswordScreen(),
+                ),
+              );
+            },
           ),
           const Divider(height: 1),
           ListTile(
