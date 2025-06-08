@@ -38,6 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadAvatarFromFirestore();
+    _loadNotificationsState();
   }
 
   Future<void> _loadAvatarFromFirestore() async {
@@ -58,6 +59,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _selectedAvatar = doc.data()?['avatar'] as String?;
       _userName = doc.data()?['name'] as String?;
       _loadingAvatar = false;
+    });
+  }
+
+  Future<void> _loadNotificationsState() async {
+    final user = context.read<AuthBloc>().state.user;
+    if (user == null) return;
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+    setState(() {
+      _notificationsEnabled =
+          doc.data()?['notificationsEnabled'] as bool? ?? false;
     });
   }
 
@@ -180,7 +195,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          tooltip: 'Editar nombre',
                           onPressed: () async {
                             final newName = await showDialog<String>(
                               context: context,
@@ -299,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _saveAvatarToFirestore(selected);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Avatar actualizado.'),
+          content: const Text('Avatar actualizado.'),
           backgroundColor: Colors.green,
         ),
       );
@@ -330,6 +344,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 setState(() {
                   _notificationsEnabled = value;
                 });
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(context.read<AuthBloc>().state.user?.uid)
+                    .set({
+                      'notificationsEnabled': value,
+                    }, SetOptions(merge: true));
                 await FirebaseMessagingService().initialize(
                   enableNotifications: value,
                 );
