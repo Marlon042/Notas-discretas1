@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/core/widgets/avatar_notifier.dart';
-import 'package:prueba/features/security/screens/change_password_screen.dart';
+import 'package:prueba/features/profile/security_screen/change_password_screen.dart';
 import 'package:prueba/core/services/firebase_messaging_service.dart';
 
 class ProfileScreen extends StatefulWidget {
