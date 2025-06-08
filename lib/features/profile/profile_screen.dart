@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/core/widgets/avatar_notifier.dart';
+import 'package:prueba/core/services/firebase_messaging_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -30,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _selectedAvatar;
   String? _userName;
   bool _loadingAvatar = true;
+  bool _notificationsEnabled = false;
 
   @override
   void initState() {
@@ -210,6 +212,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 'name': value,
                                               }, SetOptions(merge: true));
                                           Navigator.pop(context, value);
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Nombre actualizado a "$value".',
+                                              ),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
                                         }
                                       },
                                       child: const Text('Guardar'),
@@ -277,6 +289,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         AvatarNotifier.avatarPath.value = selected;
       });
       await _saveAvatarToFirestore(selected);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Avatar actualizado.'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -296,6 +314,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Card(
       child: Column(
         children: [
+          ListTile(
+            title: const Text('Activar Notificaciones'),
+            trailing: Switch(
+              value: _notificationsEnabled,
+              onChanged: (value) async {
+                setState(() {
+                  _notificationsEnabled = value;
+                });
+                await FirebaseMessagingService().initialize(
+                  enableNotifications: value,
+                );
+              },
+            ),
+          ),
+          const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.security),
             title: const Text('Seguridad'),

@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   #dependencias para flutter bloc y funciones de firebase
+  firebase_messaging: 15.2.5
   flutter_bloc: ^9.1.1
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.3
