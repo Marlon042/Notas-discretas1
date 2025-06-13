@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
 import 'package:prueba/features/notes/bloc/note_event.dart';
+import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 
 class NoteSearchBar extends StatelessWidget {
   const NoteSearchBar({super.key});
@@ -26,7 +27,8 @@ class NoteSearchBar extends StatelessWidget {
           ),
         ),
         onChanged: (value) {
-          context.read<NoteBloc>().add(SearchNotes(value));
+          final userId = context.read<AuthBloc>().state.user?.uid ?? '';
+          context.read<NoteBloc>().add(SearchNotes(value, userId));
         },
       ),
     );

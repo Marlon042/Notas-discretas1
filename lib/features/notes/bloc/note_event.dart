@@ -9,11 +9,12 @@ abstract class NoteEvent extends Equatable {
 
 class SearchNotes extends NoteEvent {
   final String title;
+  final String userId;
 
-  const SearchNotes(this.title);
+  const SearchNotes(this.title, this.userId);
 
   @override
-  List<Object?> get props => [title];
+  List<Object?> get props => [title, userId];
 }
 
 class DeleteNote extends NoteEvent {

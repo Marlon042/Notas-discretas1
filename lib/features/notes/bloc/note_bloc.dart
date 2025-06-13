@@ -30,6 +30,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
       try {
         final filteredNotes = await noteRepository.searchNotesByTitle(
           event.title,
+          event.userId,
         );
         emit(NoteLoaded(filteredNotes));
       } catch (e) {

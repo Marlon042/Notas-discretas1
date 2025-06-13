@@ -4,9 +4,10 @@ import '../models/note_model.dart';
 class NoteRepository {
   final notesRef = FirebaseFirestore.instance.collection('notes');
 
-  Future<List<Note>> searchNotesByTitle(String title) async {
+  Future<List<Note>> searchNotesByTitle(String title, String userId) async {
     final allNotes =
         await notesRef
+            .where('userId', isEqualTo: userId)
             .where('title', isGreaterThanOrEqualTo: title)
             .where('title', isLessThanOrEqualTo: title + '\uf8ff')
             .get();
