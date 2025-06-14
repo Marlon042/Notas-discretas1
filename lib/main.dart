@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import necesario para Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/app/app_widget.dart';
-// Importación necesaria para el ThemeBloc
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prueba/features/settings/bloc/theme_bloc.dart';
+import 'package:prueba/core/widgets/splash_screen.dart';
 
-void main() async {
+Future<void> initializeApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
@@ -15,6 +15,24 @@ void main() async {
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
+}
 
-  runApp(BlocProvider(create: (_) => ThemeBloc(), child: const AppWidget()));
+void main() {
+  runApp(
+    BlocProvider(
+      create: (_) => ThemeBloc(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: FutureBuilder(
+          future: initializeApp(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return const AppWidget();
+            }
+            return const SplashScreen();
+          },
+        ),
+      ),
+    ),
+  );
 }
