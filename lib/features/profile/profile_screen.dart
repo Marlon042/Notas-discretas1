@@ -181,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onPressed: () async {
                             final newName = await showDialog<String>(
                               context: context,
-                              builder: (context) {
+                              builder: (innerContext) {
                                 final controller = TextEditingController(
                                   text: _userName ?? '',
                                 );
@@ -197,7 +197,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context),
+                                      onPressed:
+                                          () => Navigator.pop(innerContext),
                                       child: const Text('Cancelar'),
                                     ),
                                     ElevatedButton(
@@ -206,27 +207,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         if (value.isNotEmpty &&
                                             value.length <= 40) {
                                           final user =
-                                              context
-                                                  .read<AuthBloc>()
-                                                  .state
-                                                  .user;
-                                          await FirebaseFirestore.instance
-                                              .collection('users')
-                                              .doc(user!.uid)
-                                              .set({
-                                                'name': value,
-                                              }, SetOptions(merge: true));
-                                          Navigator.pop(context, value);
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Nombre actualizado a "$value".',
-                                              ),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
+                                              BlocProvider.of<AuthBloc>(
+                                                context,
+                                              ).state.user;
+                                          if (user != null) {
+                                            await FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc(user.uid)
+                                                .set({
+                                                  'name': value,
+                                                }, SetOptions(merge: true));
+                                            Navigator.pop(innerContext, value);
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Nombre actualizado a "$value".',
+                                                  ),
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                              );
+                                            }
+                                          }
                                         }
                                       },
                                       child: const Text('Guardar'),
