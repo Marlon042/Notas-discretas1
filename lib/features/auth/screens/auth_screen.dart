@@ -36,11 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
               children: [
                 const SizedBox(height: 40),
                 // Logo de la app
-                Image.asset(
-                  'assets/images/flutter_logo.png',
-                  height: 120,
-                  width: 120,
-                ),
+                Image.asset('assets/images/notes.png', height: 120, width: 120),
                 const SizedBox(height: 32),
                 Text(
                   'Bienvenido a Notas Discretas',
