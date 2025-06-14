@@ -4,7 +4,6 @@ import 'package:prueba/features/auth/bloc/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prueba/core/widgets/avatar_notifier.dart';
 import 'package:prueba/features/profile/security_screen/change_password_screen.dart';
-import 'package:prueba/core/services/firebase_messaging_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -32,13 +31,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _selectedAvatar;
   String? _userName;
   bool _loadingAvatar = true;
-  bool _notificationsEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _loadAvatarFromFirestore();
-    _loadNotificationsState();
   }
 
   Future<void> _loadAvatarFromFirestore() async {
@@ -59,20 +56,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _selectedAvatar = doc.data()?['avatar'] as String?;
       _userName = doc.data()?['name'] as String?;
       _loadingAvatar = false;
-    });
-  }
-
-  Future<void> _loadNotificationsState() async {
-    final user = context.read<AuthBloc>().state.user;
-    if (user == null) return;
-    final doc =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-    setState(() {
-      _notificationsEnabled =
-          doc.data()?['notificationsEnabled'] as bool? ?? false;
     });
   }
 
@@ -337,27 +320,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           ListTile(
-            title: const Text('Activar Notificaciones'),
-            trailing: Switch(
-              value: _notificationsEnabled,
-              onChanged: (value) async {
-                setState(() {
-                  _notificationsEnabled = value;
-                });
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(context.read<AuthBloc>().state.user?.uid)
-                    .set({
-                      'notificationsEnabled': value,
-                    }, SetOptions(merge: true));
-                await FirebaseMessagingService().initialize(
-                  enableNotifications: value,
-                );
-              },
-            ),
-          ),
-          const Divider(height: 1),
-          ListTile(
             leading: const Icon(Icons.security),
             title: const Text('Seguridad'),
             trailing: const Icon(Icons.chevron_right),
@@ -369,13 +331,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               );
             },
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.notifications),
-            title: const Text('Notificaciones'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.pushNamed(context, '/notifications'),
           ),
           const Divider(height: 1),
           ListTile(
