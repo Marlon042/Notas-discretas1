@@ -10,6 +10,7 @@ import 'package:prueba/features/profile/profile_screen.dart';
 import 'package:prueba/features/settings/settings_screen.dart';
 import 'package:prueba/features/notes/repositories/note_repository.dart';
 import 'package:prueba/features/notes/bloc/note_bloc.dart';
+import 'package:prueba/core/widgets/splash_screen.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -42,7 +43,8 @@ class AppWidget extends StatelessWidget {
           theme: ThemeData(primarySwatch: Colors.blue),
           initialRoute: '/',
           routes: {
-            '/': (context) => const AuthScreen(),
+            '/': (context) => const SplashWrapper(),
+            '/auth': (context) => const AuthScreen(),
             '/home': (context) => const HomeScreen(),
             '/login': (context) => const AuthScreen(),
             '/register': (context) => const RegisterScreen(),
@@ -53,5 +55,28 @@ class AppWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SplashWrapper extends StatefulWidget {
+  const SplashWrapper({super.key});
+
+  @override
+  State<SplashWrapper> createState() => _SplashWrapperState();
+}
+
+class _SplashWrapperState extends State<SplashWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    // Esperar 2 segundos y luego redirigir
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacementNamed('/auth');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const SplashScreen();
   }
 }
