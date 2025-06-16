@@ -27,6 +27,20 @@ class _SplashScreenState extends State<SplashScreen> {
                   backgroundColor: Color(0xFFE0E0E0),
                 ),
               ),
+              const SizedBox(height: 24),
+              const Text(
+                'Notas Discretas',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4A6FA5),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'v1.0.0',
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
             ],
           ),
         ),
