@@ -10,15 +10,15 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Configuración')),
       body: ListView(
         children: [
-          const Divider(),
-          ListTile(
+          //const Divider(),
+          /* ListTile(
             leading: const Icon(Icons.language),
             title: const Text('Idioma'),
             subtitle: const Text('Español'),
             onTap: () {
               // Aquí puedes implementar el cambio de idioma
             },
-          ),
+          )*/
           const Divider(),
           ListTile(
             leading: const Icon(Icons.info_outline),
@@ -28,7 +28,8 @@ class SettingsScreen extends StatelessWidget {
                 context: context,
                 applicationName: 'Notas Discretas',
                 applicationVersion: '1.0.0',
-                applicationLegalese: '© 2024 Notas Discretas',
+                applicationLegalese:
+                    '© 2024 Notas Discretas\nDesarrollado por: Marlon Gutiérrez \nUniversidad Nacional de Costa Rica',
               );
             },
           ),
