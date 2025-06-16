@@ -1,0 +1,55 @@
+GUÍA PARA CREAR PRESENTACIÓN POWERPOINT MANUALMENTE
+
+1. ABRIR POWERPOINT
+- Crear nueva presentación en blanco
+- Guardar como "Presentacion_Notas_Discretas.pptx"
+
+2. PORTADA (Diapositiva 1)
+- Título: "Notas Discretas"
+- Subtítulo: "Presentación Feria de Proyectos"
+- Insertar imagen: assets/images/flutter_logo.png
+- Ajustar tamaño y posición del logo
+
+3. RESUMEN EJECUTIVO (Diapositiva 2)
+- Título: "Resumen Ejecutivo"
+- Copiar texto del apartado 2 del markdown
+- Formatear en viñetas claras
+
+4. STACK TECNOLÓGICO (Diapositiva 3)
+- Título: "Stack Tecnológico"
+- Crear tabla con 2 columnas:
+  * Tecnología (Flutter, Firebase, etc.)
+  * Uso (Framework, Base de datos, etc.)
+- Añadir iconos representativos
+
+5. DIAGRAMA ARQUITECTÓNICO (Diapositiva 4)
+- Título: "Arquitectura de la Aplicación"
+- Insertar diagrama usando SmartArt o formas:
+  * Rectángulos para cada capa (UI, BLoC, Firebase)
+  * Flechas para conexiones
+- Usar colores corporativos
+
+6. FUNCIONALIDADES POR MÓDULO (Diapositivas 5-8)
+- Crear una diapositiva por módulo:
+  * Autenticación
+  * Notas 
+  * Perfil
+  * Configuración
+- Incluir iconos y breve descripción
+
+7. CARACTERÍSTICAS INNOVADORAS (Diapositiva 9)
+- Título: "Innovaciones"
+- Listar las 5 características principales
+- Destacar con efectos de animación
+
+8. CAPTURAS DE PANTALLA (Diapositivas 10-11)
+- Insertar imágenes: 
+  * flutter_01.png (Pantalla principal)
+  * flutter_02.png (Editor de notas)
+- Añadir descripciones breves
+
+CONSEJOS DE DISEÑO:
+- Usar paleta de colores consistente
+- Mantener máximo 5 viñetas por slide
+- Usar transiciones sutiles entre slides
+- Revisar ortografía y alineación
